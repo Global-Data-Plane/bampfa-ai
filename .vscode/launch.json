@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Run Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Run FastAPI (BAMPFA)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+          "main:app",
+          "--reload",
+          "--port", "8000"
+      ],
+      "jinja": true,
+      "justMyCode": true,
+      "env": {
+          "PYTHONUNBUFFERED": "1"
+      }
+    }
+  ]
+}

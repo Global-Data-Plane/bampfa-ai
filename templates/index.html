@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAMPFA AI Search</title>
+    <link rel="icon" type="image/png" href="https://collection.bampfa.berkeley.edu/assets/favicon-1f0110409ab0fbad9ace613013f97b1a538d058ac625dd929274d5dfd74bc92f.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 min-h-screen text-stone-900 font-sans selection:bg-stone-300">
+    
+    <div class="max-w-5xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+       <header class="flex items-center pb-6 mb-8 border-b-2 border-stone-900">
+            <a href="/" class="mr-6 transition-opacity hover:opacity-80">
+                <img src="https://collection.bampfa.berkeley.edu/wordmark-logo-bampfa.png" alt="BAMPFA Logo" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            
+            <h1 class="text-2xl font-light tracking-wide text-stone-600 mb-0 border-l border-stone-300 pl-6">
+                AI Collections Explorer
+            </h1>
+        </header>
+        
+        <div class="mb-10">
+            <p class="mt-4 text-xl text-stone-500 font-light">Search the museum archive using everyday language.</p>
+        </div>
+
+        <form method="POST" action="/search" class="bg-white shadow-lg rounded-xl p-4 sm:p-6 mb-12 border border-stone-200" id="searchForm">
+            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <input type="text" name="query" id="queryInput" required autofocus
+                       class="flex-1 block w-full rounded-lg border-stone-300 shadow-sm focus:border-stone-900 focus:ring-stone-900 text-lg p-4 border bg-stone-50 placeholder-stone-400 outline-none transition-colors"
+                       placeholder="e.g. Find typed documents with black ink stamps"
+                       value="{{ query if query else '' }}">
+                
+                <button type="submit" id="submitBtn"
+                        class="w-full sm:w-auto inline-flex justify-center items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-lg shadow-sm text-white bg-stone-900 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 transition-all duration-200">
+                    <span id="btnText">Search</span>
+                    <svg id="loadingSpinner" class="hidden animate-spin ml-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+       {% if query %}
+    <div class="animate-fade-in-up mb-12">
+        <h2 class="text-lg font-medium text-stone-500 mb-6 border-l-4 border-stone-900 pl-3">Results for: <span class="italic text-stone-800 font-bold">"{{ query }}"</span></h2>
+        
+        {% if error %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                <div class="flex">
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700"><strong>API Error:</strong> {{ error }}</p>
+                    </div>
+                </div>
+            </div>
+            
+        {% elif artworks and artworks|length > 0 %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for art in artworks %}
+                <article class="bg-white flex flex-col h-full shadow-sm border border-stone-200 p-6 hover:shadow-lg transition-shadow duration-200 group">
+    
+                <div class="mb-4 flex-grow">
+                    <h3 class="text-xl font-bold text-stone-900 mb-2 leading-tight group-hover:text-blue-600 transition-colors">
+                        <a href="{{ art.url }}" target="_blank" rel="noopener noreferrer">
+                            {{ art.title }}
+                        </a>
+                    </h3>
+                    <p class="text-sm font-semibold tracking-wide text-stone-600 uppercase">{{ art.artist }}</p>
+                </div>
+                
+                <div class="pt-4 border-t border-stone-100 mt-auto">
+                    <dl class="space-y-1 text-sm text-stone-500 mb-4">
+                        {% if art.classification %}
+                        <div class="flex justify-between">
+                            <dt class="font-medium text-stone-400">Class</dt>
+                            <dd class="text-right text-stone-800">{{ art.classification }}</dd>
+                        </div>
+                        {% endif %}
+                        
+                        {% if art.material %}
+                        <div class="flex justify-between">
+                            <dt class="font-medium text-stone-400">Material</dt>
+                            <dd class="text-right text-stone-800 truncate max-w-[180px]" title="{{ art.material }}">{{ art.material }}</dd>
+                        </div>
+                        {% endif %}
+                    </dl>
+                    
+                    <a href="{{ art.url }}" target="_blank" rel="noopener noreferrer" 
+                    class="inline-flex items-center text-sm font-medium text-stone-900 hover:text-blue-600 transition-colors">
+                        View Catalog Record
+                        <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+                {% endfor %}
+            </div>
+            
+        {% else %}
+            <div class="bg-white shadow-sm p-12 border border-stone-200 text-center">
+                <h3 class="mt-2 text-lg font-semibold text-stone-900">No matching artworks found</h3>
+                <p class="mt-1 text-md text-stone-500 italic">The database yielded no secrets for this query. Try a different search.</p>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('loadingSpinner');
+            const btnText = document.getElementById('btnText');
+            
+            btn.classList.add('cursor-not-allowed', 'opacity-90');
+            btn.disabled = true;
+            btnText.textContent = "Analyzing intent...";
+            spinner.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
