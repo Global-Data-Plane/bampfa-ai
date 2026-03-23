@@ -204,3 +204,4 @@ async def search_bampfa(request: Request, query: str = Form(...)):
         "artworks": artworks_data,
         "error": error_msg
     })
+

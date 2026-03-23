@@ -15,15 +15,16 @@
       "request": "launch",
       "module": "uvicorn",
       "args": [
-          "main:app",
-          "--reload",
-          "--port", "8000"
+        "main:app",
+        "--host", "0.0.0.0",
+        "--port", "8000"
       ],
       "jinja": true,
       "justMyCode": true,
       "env": {
-          "PYTHONUNBUFFERED": "1"
-      }
-    }
+        "PYTHONUNBUFFERED": "1"
+      },
+      "envFile": "${workspaceFolder}/.env"
+  }
   ]
 }
