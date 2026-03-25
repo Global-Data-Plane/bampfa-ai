@@ -195,13 +195,16 @@ async def search_bampfa(request: Request, query: str = Form(...)):
     except Exception as e:
         error_msg = str(e)
         logger.error(error_msg)
-
     
+    return templates.TemplateResponse(
+        request=request, 
+        name="index.html", 
+        context={
+            "request": request,
+            "query": query,
+            "artworks": artworks_data,
+            "error": error_msg
+        }
+    )
 
-    return templates.TemplateResponse("index.html", {
-        "request": request, 
-        "query": query, 
-        "artworks": artworks_data,
-        "error": error_msg
-    })
 
