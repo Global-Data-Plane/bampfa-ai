@@ -12,7 +12,8 @@ from typing import Any
 load_dotenv()
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 # Setup the Brain
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -75,7 +76,11 @@ def parse_results(json_data: dict):
 
 @app.get("/")
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={"request": request},
+    )
 
 @app.post("/search")
 async def search_bampfa(request: Request, query: str = Form(...)):
@@ -206,5 +211,4 @@ async def search_bampfa(request: Request, query: str = Form(...)):
             "error": error_msg
         }
     )
-
 
